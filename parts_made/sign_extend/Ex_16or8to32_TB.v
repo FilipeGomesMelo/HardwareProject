@@ -2,8 +2,8 @@
 
 module Ex16or8to32_TB();
 
-	reg [15:0] I1_TB;
-    reg [7:0] I2_TB;
+	reg I1_TB;
+	reg [7:0] I2_TB;
 	reg seletor_TB;
 	wire [31:0] F_TB;
 
