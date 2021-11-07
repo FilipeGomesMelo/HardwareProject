@@ -1,4 +1,4 @@
-module mux_IorD (  
+module Mux_IorD (  
     input wire [1:0] selector,
     input wire [31:0] data_0, data_1, data_2, data_3,
     output wire [31:0] data_out

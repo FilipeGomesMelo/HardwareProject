@@ -6,7 +6,7 @@ module mux_4TB();
 	reg [1:0] seletor_TB;
 	wire [31:0] F_TB;
 
-	mux_AluB DUT(seletor_TB, I1_TB, I2_TB, I3_TB, F_TB);
+	Mux_AluB DUT(seletor_TB, I1_TB, I2_TB, I3_TB, F_TB);
 
 	assign I1_TB = 32'd9;
 	assign I2_TB = 32'd7;

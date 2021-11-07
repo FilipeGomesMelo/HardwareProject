@@ -14,9 +14,8 @@ module cpu (
 
     // control wires (REGs)
     wire PcWrite;
-    wire Load_A;
-    wire Load_B;
-    wire ALUout_Load;
+    wire Load_AB;
+    wire ALUOut_Load;
     wire EPCwrite;
 
     // control wires (big boys)
@@ -38,7 +37,7 @@ module cpu (
     wire [4:0] RS;
     wire [4:0] RT;
     wire [15:0] Immediate;
-    wire [31:0] Pc_In;
+    wire [31:0] mux_PcSource_out;
     wire [31:0] Pc_Out;
     wire [31:0] ExCause_Out;
     wire [31:0] ALUOut_Out;
@@ -49,25 +48,40 @@ module cpu (
     wire [31:0] LoadAux_Out;
     wire [31:0] mux_wr_Out;
     wire [31:0] mux_wd_Out;
+    wire [31:0] A_Out;
+    wire [31:0] B_Out;
+    wire [31:0] Ex_16or8to32_Out;
+    wire [31:0] Shift_left2_Out;
+    wire [31:0] mux_AluA_out;
+    wire [31:0] mux_AluB_out;
+    wire [31:0] shiftEx_26to28_out;
+
+    // Flags da ALU
+    wire ALU_overflow;
+    wire ALU_negative;
+    wire ALU_zero;
+    wire ALU_eq; 
+    wire ALU_gt;
+    wire ALU_lt;
 
     Registrador PC_(
         // Entradas
         clk,
         reset,
         PcWrite, // vamos ter que trocar isso quando for pra implementar os Branches
-        Pc_In,
+        mux_PcSource_out,
         // Saidas
         Pc_Out
     );
 
-    mux_ExCause ExCause_(
+    Mux_ExCause ExCause_(
         // Entradas
         IorD,
         // Saidas
         ExCause_Out
     );
 
-    mux_IorD mux_Address_(
+    Mux_IorD mux_Address_(
         // Entradas
         IorD,
         Pc_Out,
@@ -109,16 +123,16 @@ module cpu (
         LoadAux_Out
     );
 
-    mux_WR mux_wr_(
+    Mux_WR mux_wr_(
         // Entradas
         WR_REG,
         RT,
-        Immediate,
+        Immediate[15:11],
         // Saidas
         mux_wr_Out
     );
 
-    mux_WD mux_wd_(
+    Mux_WD mux_wd_(
         // Entradas
         WD_REG,
         ALUOut_Out,
@@ -150,9 +164,111 @@ module cpu (
         // Entradas
         clk,
         reset,
-        Load_A,
+        Load_AB,
         ReadData1,
         // Saidas
-        Pc_Out
+        A_Out
     );
+
+    Registrador B_(
+        // Entradas
+        clk,
+        reset,
+        Load_AB,
+        ReadData2,
+        // Saidas
+        B_Out
+    );
+
+    Ex_16or8to32 singEx_16or8to32(
+        // Entradas
+        SingExCtrl,
+        Immediate,
+        Mem_Out[7:0],
+        // Saidas
+        Ex_16or8to32_Out
+    );
+
+    Shift_left2 SL2_(
+        // Etradas
+        Ex_16or8to32_Out,
+        // Saidas
+        Shift_left2_Out
+    );
+
+    Mux_AluA mux_AluA_(
+        // Entradas
+        ALUSrcA,
+        Pc_Out,
+        // 0
+        A_Out,
+        // Saidas
+        mux_AluA_out
+    );
+
+    Mux_AluB mux_AluB_(
+        // Entradas
+        ALUSrcB,
+        B_Out,
+        // 4
+        Ex_16or8to32_Out,
+        Shift_left2_Out,
+        // Saidas
+        mux_AluB_out
+    );
+
+    ula32 ula32_(
+        // Entradas
+        mux_AluA_out,
+        mux_AluB_out,
+        ALUOp,
+        // Saidas
+        ALU_result,
+        ALU_overflow,
+        ALU_negative,
+        ALU_zero,
+        ALU_eq, 
+        ALU_gt,
+        ALU_lt
+    );
+
+    Registrador ALUOut_(
+        // Entradas
+        clk,
+        reset,
+        ALUOut_Load,
+        ALU_result,
+        // Saidas
+        ALUOut_Out
+    );
+
+    Registrador EPC_(
+        // Entradas
+        clk,
+        reset,
+        EPCwrite,
+        ALU_result,
+        // Saidas
+        EPC_Out
+    );
+
+    Mux_PcSource mux_PcSource_(
+        // Entradas
+        PcSource,
+        ALU_result,
+        ALUOut_Out,
+        {Pc_Out[31:28], shiftEx_26to28_out},
+        EPC_Out, 
+        // Saidas
+        mux_PcSource_out,
+    );
+
+    ShiftEx_26to28 shiftEx_26to28_(
+        // Entradas
+        {RS, RT, Immediate},
+        // Saidas
+        shiftEx_26to28_out
+    );
+
+    
 endmodule

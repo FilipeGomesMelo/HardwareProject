@@ -6,7 +6,7 @@ module mux_WD_TB();
     wire [31:0] data_0_TB, data_1_TB, data_2_TB, data_3_TB, data_4_TB, data_5_TB;
     wire [31:0] data_out_TB;
 
-	mux_WD DUT(selector_TB, data_0_TB, data_1_TB, data_2_TB, data_3_TB, data_4_TB, data_5_TB, data_out_TB);
+	Mux_WD DUT(selector_TB, data_0_TB, data_1_TB, data_2_TB, data_3_TB, data_4_TB, data_5_TB, data_out_TB);
 
     assign data_0_TB = 32'd0;
     assign data_1_TB = 32'd1;

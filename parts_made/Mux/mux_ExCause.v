@@ -1,4 +1,4 @@
-module mux_ExCause (  
+module Mux_ExCause (  
     input wire [1:0] selector,
     output wire [31:0] data_out
 );

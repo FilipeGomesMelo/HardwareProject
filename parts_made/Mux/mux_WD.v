@@ -1,4 +1,4 @@
-module mux_WD (
+module Mux_WD (
     input wire [2:0] selector,
     input wire [31:0] data_0, data_1, data_2, data_3, data_4, data_5,
     output wire [31:0] data_out

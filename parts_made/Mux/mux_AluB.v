@@ -1,4 +1,4 @@
-module mux_AluB (  
+module Mux_AluB (  
     input wire [1:0] selector,
     input wire [31:0] data_0, data_1, data_2,
     output wire [31:0] data_out

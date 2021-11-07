@@ -1,4 +1,4 @@
-module shift_left2 (
+module Shift_left2 (
     input wire [31:0] data_in;
     output wire [31:0] data_out;
 );
