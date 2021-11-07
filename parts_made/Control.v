@@ -290,111 +290,183 @@ module Control (
                 end
                 ST_OPError: begin
                     // OPcode inexistente
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_Overflow: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_ZeroDiv: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_ADD: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_AND: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_DIV: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_MULT: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_JR: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_MFHI: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_MFLO: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SLL: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SLLV: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SLT: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SRA: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SRAV: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SRL: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SUB: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_BREAK: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_RTE: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_ADDI: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_ADDIU: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_BEQ: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_BNE: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_BLE: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_BGT: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SRAM: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_LB: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_LH: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_LUI: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_LW: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SB: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SH: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_SLTI: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_RT: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_J: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
                 ST_JAL: begin
                     // TODO
+                    COUNTER = 5'b00000;
+                    state = ST_Fetch;
                 end
             endcase
         end
