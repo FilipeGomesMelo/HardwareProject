@@ -180,7 +180,7 @@ module cpu (
         B_Out
     );
 
-    Ex_16or8to32 singEx_16or8to32(
+    Ex_16or8to32 singEx_16or8to32_(
         // Entradas
         SingExCtrl,
         Immediate,
@@ -270,5 +270,5 @@ module cpu (
         shiftEx_26to28_out
     );
 
-    
+
 endmodule
