@@ -137,6 +137,7 @@ module Control (
     parameter FUNCT_RTE = 6'b010_011;
     parameter FUNCT_DIVM = 6'b000_101;
 
+    // teste
 
     always @(posedge clk) begin
         if (reset == 1'b1 or state == ST_Reset) begin
