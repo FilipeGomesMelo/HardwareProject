@@ -10,13 +10,13 @@ module Control (
 
         // Sinais de controle
         // control wires (mux)
-        output reg [2:0] ExCause,
-        output reg [2:0] IorD,
-        output reg [2:0] WR_REG,
-        output reg [2:0] ALUSrcA,
-        output reg [2:0] ALUSrcB,
-        output reg [2:0] PcSource,
-        output reg [3:0] WD_REG,
+        output reg [1:0] ExCause,
+        output reg [1:0] IorD,
+        output reg [1:0] WR_REG,
+        output reg [1:0] ALUSrcA,
+        output reg [1:0] ALUSrcB,
+        output reg [1:0] PcSource,
+        output reg [2:0] WD_REG,
 
         // control regs (REGs)
         output reg PcWrite,
@@ -120,7 +120,7 @@ module Control (
 
     // Funct tipo R
     parameter FUNCT_ADD = 6'b100_000;
-    parameter FUNCT_ADDI = 6'b100_100;
+    parameter FUNCT_AND = 6'b100_100;
     parameter FUNCT_DIV = 6'b011_010;
     parameter FUNCT_MULT = 6'b011_000;
     parameter FUNCT_JR = 6'b001_000;
@@ -140,7 +140,7 @@ module Control (
     // teste
 
     always @(posedge clk) begin
-        if (reset == 1'b1 or state == ST_Reset) begin
+        if (reset == 1'b1 || state == ST_Reset) begin
             // Coloca todos sinais de controle para 0
             PcWrite = 1'b0;
             Load_AB = 1'b0;
@@ -185,7 +185,7 @@ module Control (
                         IorD = 1'b00;
                         MemRead = 1'b1;
                         ALUSrcA = 2'b00;
-                        ALUSrcA = 2'b01;
+                        ALUSrcB = 2'b01;
                         ALUOp = 3'b001;
 
                         // Update do counter
@@ -236,8 +236,8 @@ module Control (
                                     FUNCT_ADD: begin
                                         state = ST_ADD;
                                     end
-                                    FUNCT_ADDI: begin
-                                        state = ST_ADDI;
+                                    FUNCT_AND: begin
+                                        state = ST_AND;
                                     end
                                     FUNCT_DIV: begin
                                         state = ST_DIV;
@@ -423,9 +423,45 @@ module Control (
                     state = ST_Fetch;
                 end
                 ST_SUB: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // CRCP
+                    if(COUNTER == 5'b00000){
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b010;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+
+                        
+                        COUNTER = COUNTER + 5'b00001;
+
+                    }else if(COUNTER == 5'b00001){
+                        ALUOut_Load = 1'b0;
+                        
+                        WR_REG = 2'b01;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b1;
+                        
+                        COUNTER = COUNTER + 5'b00001;
+                    }
+                    else{
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    }
                 end
                 ST_BREAK: begin
                     // TODO
@@ -438,14 +474,90 @@ module Control (
                     state = ST_Fetch;
                 end
                 ST_ADDI: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // CRCP
+                    if(COUNTER == 5'b00000){
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        // reseta o valor do registratodor da pilha no banco de registradores
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+
+                        
+                        COUNTER = COUNTER + 5'b00001;
+
+                    }else if(COUNTER == 5'b00001){
+                        ALUOut_Load = 1'b0;
+                        
+                        WR_REG = 2'b01;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b1;
+                        
+                        COUNTER = COUNTER + 5'b00001;
+                    }
+                    else{
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    }
                 end
                 ST_ADDIU: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // CRCP
+                    if(COUNTER == 5'b00000){
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b10;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        // reseta o valor do registratodor da pilha no banco de registradores
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+
+                        
+                        COUNTER = COUNTER + 5'b00001;
+
+                    }else if(COUNTER == 5'b00001){
+                        ALUOut_Load = 1'b0;
+                        
+                        WR_REG = 2'b01;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b1;
+                        
+                        COUNTER = COUNTER + 5'b00001;
+                    }
+                    else{
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    }
                 end
                 ST_BEQ: begin
                     // TODO
