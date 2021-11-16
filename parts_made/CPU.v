@@ -4,13 +4,13 @@ module cpu (
 );
 
     // control wires (mux)
-    wire [2:0] ExCauxe;
-    wire [2:0] IorD;
-    wire [2:0] WR_REG;
-    wire [2:0] ALUSrcA;
-    wire [2:0] ALUSrcB;
-    wire [2:0] PcSource;
-    wire [3:0] WD_REG;
+    wire [1:0] ExCause;
+    wire [1:0] IorD;
+    wire [1:0] WR_REG;
+    wire [1:0] ALUSrcA;
+    wire [1:0] ALUSrcB;
+    wire [1:0] PcSource;
+    wire [2:0] WD_REG;
 
     // control wires (REGs)
     wire PcWrite;
@@ -270,5 +270,33 @@ module cpu (
         shiftEx_26to28_out
     );
 
-
+    Control control_(
+        // Entradas,
+        clk,
+        reset,
+        ALU_overflow,
+        1'b0,
+        OP,
+        Immediate[5:0],
+        // Saidas
+        ExCause,
+        IorD,
+        WR_REG,
+        ALUSrcA,
+        ALUSrcB,
+        PcSource,
+        WD_REG,
+        PcWrite,
+        Load_AB,
+        ALUOut_Load,
+        EPCwrite,
+        MemWrite,
+        MemRead,
+        IRWrite,
+        RegWrite,
+        ALUOp,
+        SingExCtrl,
+        LoadCtrl,
+        StoreCtrl
+    );
 endmodule

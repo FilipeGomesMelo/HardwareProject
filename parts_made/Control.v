@@ -10,7 +10,7 @@ module Control (
 
         // Sinais de controle
         // control wires (mux)
-        output reg [2:0] ExCauxe,
+        output reg [2:0] ExCause,
         output reg [2:0] IorD,
         output reg [2:0] WR_REG,
         output reg [2:0] ALUSrcA,
@@ -140,7 +140,28 @@ module Control (
 
     always @(posedge clk) begin
         if (reset == 1'b1 or state == ST_Reset) begin
-            // RESET
+            // Coloca todos sinais de controle para 0
+            PcWrite = 1'b0;
+            Load_AB = 1'b0;
+            ALUOut_Load = 1'b0;
+            EPCwrite = 1'b0;
+            MemWrite = 1'b0;
+            MemRead = 1'b0;
+            IRWrite = 1'b0;
+            SingExCtrl = 1'b0;
+            ExCause = 2'b00;
+            IorD = 2'b00;
+            ALUSrcA = 2'b00;
+            ALUSrcB = 2'b00;
+            PcSource = 2'b00;
+            ALUOp = 3'b000;
+            LoadCtrl = 2'b00;
+            StoreCtrl = 2'b00;
+
+            // reseta o valor do registratodor da pilha no banco de registradores
+            WR_REG = 2'b11;
+            WD_REG = 3'b110;
+            RegWrite = 1'b1;
 
             // Next state
             COUNTER = 5'b00000;
@@ -150,12 +171,32 @@ module Control (
                 ST_Fetch: begin
                     // Fetch
                     if (COUNTER != 5'b00011) begin
+                        // Zera todos sinais de estados anteriores
+                        RegWrite = 1'b0;
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        IRWrite = 1'b0;
+
                         // Primeiros 3 ciclos pro load
+                        IorD = 1'b00;
+                        MemRead = 1'b1;
+                        ALUSrcA = 2'b00;
+                        ALUSrcA = 2'b01;
+                        ALUOp = 3'b001;
 
                         // Update do counter
                         COUNTER = COUNTER + 5'b00001; 
                     end else begin
+                        // Zera sinais do anterior
+                        MemRead = 1'b0;
+                        
                         // Ultimo ciclo do Fetch
+                        PcSource = 2'b00;
+                        PcWrite = 1'b1;
+                        IRWrite = 1'b1;
 
                         // Zera counter e próximo estado
                         COUNTER = 5'b00000;
@@ -164,13 +205,25 @@ module Control (
                 end    
                 ST_Decode: begin
                     if (COUNTER == 5'b00000) begin
+                        // Zera sinais do anterior
+                        PcWrite = 1'b0;
+                        IRWrite = 1'b0;
+
                         // Primeiro ciclo do Decode
-                        
+                        ALUSrcA = 2'b00;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b11;
+                        ALUOp = 3'b001;
+                        ALUOut_Load = 1'b1;
+
                         // Passa o counter
                         COUNTER = COUNTER + 5'b00001;
                     end else if (COUNTER == 5'b00001) begin
+                        // Zera sinais do anterior
+                        ALUOut_Load = 1'b0;
+                        
                         // Segundo ciclo do Decode
-
+                        Load_AB = 1'b1;
 
                         // Reinicia o counter
                         COUNTER = 5'b00000;
