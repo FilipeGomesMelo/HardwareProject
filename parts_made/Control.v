@@ -10,13 +10,13 @@ module Control (
 
         // Sinais de controle
         // control wires (mux)
-        output reg [2:0] ExCause,
-        output reg [2:0] IorD,
-        output reg [2:0] WR_REG,
-        output reg [2:0] ALUSrcA,
-        output reg [2:0] ALUSrcB,
-        output reg [2:0] PcSource,
-        output reg [3:0] WD_REG,
+        output reg [1:0] ExCause,
+        output reg [1:0] IorD,
+        output reg [1:0] WR_REG,
+        output reg [1:0] ALUSrcA,
+        output reg [1:0] ALUSrcB,
+        output reg [1:0] PcSource,
+        output reg [2:0] WD_REG,
 
         // control regs (REGs)
         output reg PcWrite,
@@ -39,7 +39,7 @@ module Control (
     );
 
     // Variáveis internas
-    reg [5:0] STATE;
+    reg [5:0] state;
     reg [4:0] COUNTER;
 
     // Constantes internas (estados)
@@ -120,7 +120,7 @@ module Control (
 
     // Funct tipo R
     parameter FUNCT_ADD = 6'b100_000;
-    parameter FUNCT_ADDI = 6'b100_100;
+    parameter FUNCT_AND = 6'b100_100;
     parameter FUNCT_DIV = 6'b011_010;
     parameter FUNCT_MULT = 6'b011_000;
     parameter FUNCT_JR = 6'b001_000;
@@ -168,7 +168,7 @@ module Control (
             COUNTER = 5'b00000;
             state = ST_Fetch;
         end else begin
-            case (state):
+            case (state)
                 ST_Fetch: begin
                     // Fetch
                     if (COUNTER != 5'b00011) begin
@@ -229,15 +229,15 @@ module Control (
                         // Reinicia o counter
                         COUNTER = 5'b00000;
                         // Seleciona o próximo estado
-                        case (OP):
+                        case (OP)
                             OP_TypeR: begin
-                                case (funct):
+                                case (funct)
                                     // Colocar todas funções aqui
                                     FUNCT_ADD: begin
                                         state = ST_ADD;
                                     end
-                                    FUNCT_ADDI: begin
-                                        state = ST_ADDI;
+                                    FUNCT_AND: begin
+                                        state = ST_AND;
                                     end
                                     FUNCT_DIV: begin
                                         state = ST_DIV;
