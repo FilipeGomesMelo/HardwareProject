@@ -39,7 +39,7 @@ module Control (
     );
 
     // Variáveis internas
-    reg [5:0] STATE;
+    reg [5:0] state;
     reg [4:0] COUNTER;
 
     // Constantes internas (estados)
@@ -168,7 +168,7 @@ module Control (
             COUNTER = 5'b00000;
             state = ST_Fetch;
         end else begin
-            case (state):
+            case (state)
                 ST_Fetch: begin
                     // Fetch
                     if (COUNTER != 5'b00011) begin
@@ -229,9 +229,9 @@ module Control (
                         // Reinicia o counter
                         COUNTER = 5'b00000;
                         // Seleciona o próximo estado
-                        case (OP):
+                        case (OP)
                             OP_TypeR: begin
-                                case (funct):
+                                case (funct)
                                     // Colocar todas funções aqui
                                     FUNCT_ADD: begin
                                         state = ST_ADD;
@@ -424,7 +424,7 @@ module Control (
                 end
                 ST_SUB: begin
                     // CRCP
-                    if(COUNTER == 5'b00000){
+                    if(COUNTER == 5'b00000) begin
                         PcWrite = 1'b0;
                         Load_AB = 1'b0;
                         ALUOut_Load = 1'b1;
@@ -449,7 +449,7 @@ module Control (
                         
                         COUNTER = COUNTER + 5'b00001;
 
-                    }else if(COUNTER == 5'b00001){
+                    end else if (COUNTER == 5'b00001) begin
                         ALUOut_Load = 1'b0;
                         
                         WR_REG = 2'b01;
@@ -457,11 +457,10 @@ module Control (
                         RegWrite = 1'b1;
                         
                         COUNTER = COUNTER + 5'b00001;
-                    }
-                    else{
+                    end else begin
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
-                    }
+                    end
                 end
                 ST_BREAK: begin
                     // TODO
@@ -475,7 +474,7 @@ module Control (
                 end
                 ST_ADDI: begin
                     // CRCP
-                    if(COUNTER == 5'b00000){
+                    if(COUNTER == 5'b00000) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
                         Load_AB = 1'b0;
@@ -502,7 +501,7 @@ module Control (
                         
                         COUNTER = COUNTER + 5'b00001;
 
-                    }else if(COUNTER == 5'b00001){
+                    end else if(COUNTER == 5'b00001) begin
                         ALUOut_Load = 1'b0;
                         
                         WR_REG = 2'b01;
@@ -510,15 +509,14 @@ module Control (
                         RegWrite = 1'b1;
                         
                         COUNTER = COUNTER + 5'b00001;
-                    }
-                    else{
+                    end else begin
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
-                    }
+                    end
                 end
                 ST_ADDIU: begin
                     // CRCP
-                    if(COUNTER == 5'b00000){
+                    if(COUNTER == 5'b00000) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
                         Load_AB = 1'b0;
@@ -545,7 +543,7 @@ module Control (
                         
                         COUNTER = COUNTER + 5'b00001;
 
-                    }else if(COUNTER == 5'b00001){
+                    end else if(COUNTER == 5'b00001) begin
                         ALUOut_Load = 1'b0;
                         
                         WR_REG = 2'b01;
@@ -553,11 +551,10 @@ module Control (
                         RegWrite = 1'b1;
                         
                         COUNTER = COUNTER + 5'b00001;
-                    }
-                    else{
+                    end else begin
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
-                    }
+                    end
                 end
                 ST_BEQ: begin
                     // TODO
