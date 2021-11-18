@@ -545,7 +545,7 @@ module Control (
                     else if(COUNTER == 5'b00001) begin
                         ALUOut_Load = 1'b0;
                         
-                        WR_REG = 2'b01;
+                        WR_REG = 2'b00;
                         WD_REG = 3'b000;
                         RegWrite = 1'b1;
                         
