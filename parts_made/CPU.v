@@ -36,6 +36,7 @@ module cpu (
     wire [5:0] OP;
     wire [4:0] RS;
     wire [4:0] RT;
+    wire [4:0] mux_wr_Out;
     wire [15:0] Immediate;
     wire [31:0] mux_PcSource_out;
     wire [31:0] Pc_Out;
@@ -45,8 +46,7 @@ module cpu (
     wire [31:0] Mux_IorD_Out;
     wire [31:0] StoreAux_Out;
     wire [31:0] Mem_Out;
-    wire [31:0] LoadAux_Out;
-    wire [31:0] mux_wr_Out;
+    wire [31:0] LoadAux_Out;   
     wire [31:0] mux_wd_Out;
     wire [31:0] A_Out;
     wire [31:0] B_Out;
@@ -54,7 +54,10 @@ module cpu (
     wire [31:0] Shift_left2_Out;
     wire [31:0] mux_AluA_out;
     wire [31:0] mux_AluB_out;
-    wire [31:0] shiftEx_26to28_out;
+    wire [27:0] shiftEx_26to28_out;
+    wire [31:0] ReadData1;
+    wire [31:0] ReadData2;
+    wire [31:0] EPC_Out;
 
     // Flags da ALU
     wire ALU_overflow;
@@ -157,7 +160,7 @@ module cpu (
         mux_wd_Out,
         // Saidas
         ReadData1,
-        ReadData2,
+        ReadData2
     );
 
     Registrador A_(
@@ -260,7 +263,7 @@ module cpu (
         {Pc_Out[31:28], shiftEx_26to28_out},
         EPC_Out, 
         // Saidas
-        mux_PcSource_out,
+        mux_PcSource_out
     );
 
     ShiftEx_26to28 shiftEx_26to28_(

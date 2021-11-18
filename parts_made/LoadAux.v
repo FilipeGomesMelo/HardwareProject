@@ -1,4 +1,4 @@
-module StoreAux (
+module LoadAux (
     input wire [1:0] selector,
     input wire [31:0] data_in,
     output wire [31:0] data_out
