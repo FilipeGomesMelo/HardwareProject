@@ -386,25 +386,20 @@ module Control (
                         
                         COUNTER = COUNTER + 5'b00001;
 
-                    end
-                    else if(COUNTER == 5'b00001) begin
-                        if(overflow = 1'b1) begin
+                    end else if(COUNTER == 5'b00001) begin
+                        ALUOut_Load = 1'b0;
+                        if(overflow == 1'b1) begin
                             COUNTER = 5'b00000;
                             state = ST_Overflow;                            
                         end
                         else begin
-                            ALUOut_Load = 1'b0;
-                        
                             WR_REG = 2'b01;
                             WD_REG = 3'b000;
                             RegWrite = 1'b1;
 
-                            COUNTER = COUNTER + 5'b00001;                            
+                            COUNTER = 5'b00000;
+                            state = ST_Fetch;
                         end
-                    end
-                    else begin
-                        COUNTER = 5'b00000;
-                        state = ST_Fetch;
                     end
                 end
                 ST_AND: begin
@@ -495,23 +490,18 @@ module Control (
                         COUNTER = COUNTER + 5'b00001;
 
                     end else if(COUNTER == 5'b00001) begin
-                        
-                        if(overflow = 1'b1) begin
+                        ALUOut_Load = 1'b0;
+                        if(overflow == 1'b1) begin
                             COUNTER = 5'b00000;
                             state = ST_Overflow;                            
                         end else begin
-                            ALUOut_Load = 1'b0;
-
                             WR_REG = 2'b01;
                             WD_REG = 3'b000;
                             RegWrite = 1'b1;
 
-                            COUNTER = COUNTER + 5'b00001;                            
+                            COUNTER = 5'b00000;
+                            state = ST_Fetch;                           
                         end
-                    end
-                    else begin
-                        COUNTER = 5'b00000;
-                        state = ST_Fetch;
                     end
                 end
                 ST_BREAK: begin
@@ -553,25 +543,20 @@ module Control (
                         
                         COUNTER = COUNTER + 5'b00001;
 
-                    end 
-                    else if(COUNTER == 5'b00001) begin
-                        if(overflow = 1'b1) begin
+                    end else if(COUNTER == 5'b00001) begin
+                        ALUOut_Load = 1'b0;
+                        if(overflow == 1'b1) begin
                             COUNTER = 5'b00000;
                             state = ST_Overflow;                            
                         end else begin
-                            ALUOut_Load = 1'b0;
-                        
                             WR_REG = 2'b00;
                             WD_REG = 3'b000;
                             RegWrite = 1'b1;
 
-                            COUNTER = COUNTER + 5'b00001;
+                            COUNTER = 5'b00000;
+                            state = ST_Fetch;
                         end                        
-                    end
-                    else begin
-                        COUNTER = 5'b00000;
-                        state = ST_Fetch;
-                    end         
+                    end      
                 end
                 ST_ADDIU: begin
                     // TODO
