@@ -11,7 +11,7 @@ module cpu (
     wire [1:0] ALUSrcB;
     wire [1:0] PcSource;
     wire [2:0] WD_REG;
-
+    
     // control wires (REGs)
     wire PcWrite;
     wire Load_AB;
@@ -25,6 +25,10 @@ module cpu (
     wire RegWrite;
     wire [2:0] ALUOp;
 
+    // control wires (RegDesloc)
+    wire [1:0] ShiftIn;
+    wire [1:0] ShiftS;
+    wire [2:0] ShiftCtrl;
 
     // control wires (others)
     wire SingExCtrl;
@@ -58,6 +62,11 @@ module cpu (
     wire [31:0] ReadData1;
     wire [31:0] ReadData2;
     wire [31:0] EPC_Out;
+
+    // Data Wires (RegDesloc)
+    wire [31:0] ShiftIn_Out;
+    wire [4:0] ShiftS_Out;
+    wire [31:0] ShiftReg_Out;
 
     // Flags da ALU
     wire ALU_overflow;
@@ -144,7 +153,7 @@ module cpu (
         32'd0,
         32'd0,
         32'd0,
-        32'd0,
+        ShiftReg_Out,
         // Saidas
         mux_wd_Out
     );
@@ -273,6 +282,37 @@ module cpu (
         shiftEx_26to28_out
     );
 
+    Mux_ShiftIn mux_shiftIn_(
+        // Entradas
+        ShiftIn,
+        A_Out,
+        Ex_16or8to32_Out,
+        B_Out,
+        // Saidas
+        ShiftIn_Out
+    );
+
+    Mux_ShiftS mux_shiftS_(
+        // Entradas
+        ShiftS,
+        B_Out[4:0],
+        Immediate[10:6],
+        Mem_Out[4:0],
+        // Saidas
+        ShiftS_Out
+    );
+
+    RegDesloc regDesloc_Out_(
+        // Entradas
+        clk,
+        reset,
+        ShiftCtrl,
+        ShiftS_Out,
+        ShiftIn_Out,
+        // Saidas
+        ShiftReg_Out
+    );
+
     Control control_(
         // Entradas,
         clk,
@@ -289,6 +329,8 @@ module cpu (
         ALUSrcB,
         PcSource,
         WD_REG,
+        ShiftIn,
+        ShiftS,
         PcWrite,
         Load_AB,
         ALUOut_Load,
@@ -298,6 +340,7 @@ module cpu (
         IRWrite,
         RegWrite,
         ALUOp,
+        ShiftCtrl,
         SingExCtrl,
         LoadCtrl,
         StoreCtrl
