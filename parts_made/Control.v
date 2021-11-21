@@ -91,7 +91,7 @@ module Control (
     parameter ST_SB = 6'b100_010;
     parameter ST_SH = 6'b100_011;
     parameter ST_SLTI = 6'b100_100;
-    parameter ST_RT = 6'b100_101;
+    parameter ST_SW = 6'b100_101;
 
     // Estados Tipo J
     parameter ST_J = 6'b100_110;
@@ -116,7 +116,7 @@ module Control (
     parameter OP_SB = 6'b101_000;
     parameter OP_SH = 6'b101_001;
     parameter OP_SLTI = 6'b001_010;
-    parameter OP_RT = 6'b101_011;
+    parameter OP_SW = 6'b101_011;
 
     // Estados Tipo J
     parameter OP_J = 6'b000_010;
@@ -335,8 +335,8 @@ module Control (
                             OP_SLTI: begin
                                 state = ST_SLTI;
                             end
-                            OP_RT: begin
-                                state = ST_RT;
+                            OP_SW: begin
+                                state = ST_SW;
                             end
                             OP_J: begin
                                 state = ST_J;
@@ -838,10 +838,42 @@ module Control (
                     COUNTER = 5'b00000;
                     state = ST_Fetch;
                 end
-                ST_RT: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                ST_SW: begin
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ALUSrcA = 2'b10;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010 || COUNTER == 5'b000011) begin
+                        // Saidas do ciclo
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
+
+                        // Sinais do ciclo
+                        StoreCtrl = 2'b00;
+                        MemWrite = 1'b1;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_J: begin
                     // TODO

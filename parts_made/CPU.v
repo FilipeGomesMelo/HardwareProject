@@ -127,6 +127,15 @@ module cpu (
         Immediate
     );
 
+    StoreAux store_aux_(
+        // Entradas
+        StoreCtrl,
+        B_Out,
+        Mem_Out,
+        // Saidas
+        StoreAux_Out
+    );
+
     LoadAux load_aux_(
         // Entradas
         LoadCtrl,
