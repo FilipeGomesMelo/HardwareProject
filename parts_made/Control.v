@@ -842,19 +842,21 @@ module Control (
                         ALUOp = 3'b001;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010 || COUNTER == 5'b000011) begin
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
                         // Saidas do ciclo
                         IorD = 2'b11;
                         MemRead = 1'b1;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000100) begin
-                        // Zera os sinais do ciclo anterior
-                        MemRead = 1'b0;
-
+                    end else if (COUNTER == 5'b000011) begin
                         // Sinais do ciclo
                         StoreCtrl = 2'b10;
                         MemWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
 
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
@@ -879,19 +881,21 @@ module Control (
                         ALUOp = 3'b001;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010 || COUNTER == 5'b000011) begin
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
                         // Saidas do ciclo
                         IorD = 2'b11;
                         MemRead = 1'b1;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000100) begin
-                        // Zera os sinais do ciclo anterior
-                        MemRead = 1'b0;
-
+                    end else if (COUNTER == 5'b000011) begin
                         // Sinais do ciclo
                         StoreCtrl = 2'b01;
                         MemWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
 
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
@@ -921,19 +925,21 @@ module Control (
                         ALUOp = 3'b001;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010 || COUNTER == 5'b000011) begin
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
                         // Saidas do ciclo
                         IorD = 2'b11;
                         MemRead = 1'b1;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000100) begin
-                        // Zera os sinais do ciclo anterior
-                        MemRead = 1'b0;
-
+                    end else if (COUNTER == 5'b000011) begin
                         // Sinais do ciclo
                         StoreCtrl = 2'b00;
                         MemWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
 
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
