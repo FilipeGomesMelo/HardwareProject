@@ -27,6 +27,9 @@ begin
         a = ComplementoM + a;
       end
       {a,Q,Q0} = {a,Q,Q0} >>> 1'b1;
+      if (a[30] == 1'b1) begin
+        a[31] = 1'b1;
+      end
       N = N - 1'b1;
       if (N == 6'd0)
       begin
