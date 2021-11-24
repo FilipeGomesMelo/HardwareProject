@@ -24,6 +24,8 @@ module Control (
         output reg PcWrite,
         output reg EQCond,
         output reg NECond,
+        output reg GTCond,
+        output reg LTECOND,
         output reg Load_AB,
         output reg ALUOut_Load,
         output reg EPCwrite,
@@ -196,6 +198,11 @@ module Control (
                         ALUSrcA = 2'b00;
                         ALUSrcB = 2'b01;
                         ALUOp = 3'b001;
+
+                        EQCond = 1'b0;
+                        NECond = 1'b0;
+                        GTCond = 1'b0;
+                        LTECOND = 1'b0;
 
                         // Update do counter
                         COUNTER = COUNTER + 5'b00001; 
@@ -862,9 +869,6 @@ module Control (
                     end else if(COUNTER == 5'b00001) begin
                         ALUOut_Load = 1'b0;
                         
-                        PcSource = 2'b00;
-                        EQCond = 1'b0;
-
                         COUNTER = 5'b00000;
                         state = ST_Fetch;                    
                     end
@@ -898,8 +902,6 @@ module Control (
                     end else if(COUNTER == 5'b00001) begin
                         ALUOut_Load = 1'b0;
                         
-                        PcSource = 2'b00;
-                        NECond = 1'b0;
 
                         COUNTER = 5'b00000;
                         state = ST_Fetch;                    

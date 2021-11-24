@@ -16,6 +16,8 @@ module cpu (
     wire PcWrite;
     wire EQCond;
     wire NECond;
+    wire GTCond;
+    wire LTECOND;
     wire Load_AB;
     wire ALUOut_Load;
     wire EPCwrite;
@@ -78,9 +80,21 @@ module cpu (
     wire ALU_gt;
     wire ALU_lt;
 
+    // Checador dos sinais de Write e condicoes
     wire WriteSignal;
 
-    assign WriteSignal = PcWrite || (ALU_eq && EQCond) || (!ALU_eq && NECond);
+    PcWriteLogic PcWL(
+        // Entradas
+        LTECOND,
+        GTCond,
+        EQCond,
+        NECond,
+        ALU_gt,
+        ALU_eq,
+        PcWrite,
+        // Saidas
+        WriteSignal
+    );
     
     Registrador PC_(
         // Entradas
@@ -340,6 +354,8 @@ module cpu (
         PcWrite,
         EQCond,
         NECond,
+        GTCond,
+        LTECOND,
         Load_AB,
         ALUOut_Load,
         EPCwrite,
