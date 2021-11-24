@@ -63,6 +63,10 @@ module cpu (
     wire [31:0] ReadData2;
     wire [31:0] EPC_Out;
 
+    // Data Wires (DIV/Mult)
+    wire [31:0] Hi;
+    wire [31:0] Lo;
+
     // Data Wires (RegDesloc)
     wire [31:0] ShiftIn_Out;
     wire [4:0] ShiftS_Out;
@@ -311,6 +315,18 @@ module cpu (
         ShiftIn_Out,
         // Saidas
         ShiftReg_Out
+    );
+
+    Mult mult_(
+        //Entradas
+        clk,
+        reset,
+        resetlocal,
+        A_Out,
+        B_Out,
+        //Saidas
+        Hi,
+        Lo
     );
 
     Control control_(
