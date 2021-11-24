@@ -88,7 +88,7 @@ module cpu (
 
     Mux_ExCause ExCause_(
         // Entradas
-        IorD,
+        ExCause,
         // Saidas
         ExCause_Out
     );

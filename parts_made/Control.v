@@ -795,7 +795,23 @@ module Control (
                     end
                 end
                 ST_BREAK: begin
-                    // TODO
+                    // Zera sinais do ciclo anterior
+                    PcWrite = 1'b0;
+                    Load_AB = 1'b0;
+                    ALUOut_Load = 1'b0;
+                    EPCwrite = 1'b0;
+                    MemWrite = 1'b0;
+                    MemRead = 1'b0;
+                    IRWrite = 1'b0;
+                    SingExCtrl = 1'b0;
+
+                    // Sinais do ciclo
+                    ALUSrcA = 2'b00;
+                    ALUSrcB = 2'b01;
+                    ALUOp = 3'b010;
+                    PcSource = 2'b00;
+                    PcWrite = 1'b1;
+
                     COUNTER = 5'b00000;
                     state = ST_Fetch;
                 end
