@@ -19,12 +19,19 @@ module Control (
         output reg [2:0] WD_REG,
         output reg [1:0] ShiftIn,
         output reg [1:0] ShiftS,
+        output reg Mult/Div,
+        output reg MemA/A,
+        output reg MemB/B,
 
         // control regs (REGs)
         output reg PcWrite,
         output reg Load_AB,
         output reg ALUOut_Load,
         output reg EPCwrite,
+        output reg AuxMultA,
+        output reg AuxMultB,
+        output reg Hi_load,
+        output reg Lo_out,
 
         // control regs (big boys)
         output reg MemWrite,
@@ -45,6 +52,7 @@ module Control (
     // Variáveis internas
     reg [5:0] state;
     reg [4:0] COUNTER;
+    reg [5:0] COUNTERDIVMULT;
 
     // Constantes internas (estados)
     // Universal
@@ -415,14 +423,126 @@ module Control (
                     state = ST_Fetch;
                 end
                 ST_DIV: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTERDIVMULT == 6'b000000) begin
+                        //zera sinais anteriores
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000001) begin
+                        //preparando os sinais
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        MemA/A = 1'b1;
+                        MemB/B = 1'b1;
+                        Mult/Div = 1'b1;
+                    end else if (COUNTERDIVMULT == 6'b100001) begin
+                        //sinais de escrita pra terminar a operação
+                        Hi_load = 1'b1;
+                        Lo_load = 1'b1;
+                        COUNTERDIVMULT = 6'b000000;
+                        state = ST_Fetch;
+                    end else begin
+                      if (ZeroDivision == 1'b1) begin
+                          COUNTERDIVMULT = 6'b000000;
+                          state = ST_ZeroDiv;
+                      end
+                      COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end
+                end
+                ST_DIVM: begin
+                    if (COUNTERDIVMULT == 6'b000000) begin
+                        //zera sinais anteriores
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000001) begin
+                        //preparando os sinais
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        ALUSrcA = 2'b10;
+                        ALUOp = 3'b000;
+                    end else if (COUNTERDIVMULT == 6'b100001) begin
+                        //sinais de escrita pra terminar a operação
+                        Hi_load = 1'b1;
+                        Lo_load = 1'b1;
+                        COUNTERDIVMULT = 6'b000000;
+                        state = ST_Fetch;
+                    end else begin
+                      if (ZeroDivision == 1'b1) begin
+                          COUNTERDIVMULT = 6'b000000;
+                          state = ST_ZeroDiv;
+                      end
+                      COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end
                 end
                 ST_MULT: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // Multiplicação
+                    if (COUNTERDIVMULT == 6'b000000) begin
+                        //zera sinais anteriores
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 5'b00001) begin
+                        //preparando os sinais
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        MemA/A = 1'b1;
+                        MemB/B = 1'b1;
+                        Mult/Div = 1'b0;
+                    end else if (COUNTERDIVMULT == 6'b100001) begin
+                        //sinais de escrita pra terminar a operação
+                        Hi_load = 1'b1;
+                        Lo_load = 1'b1;
+                        COUNTERDIVMULT = 6'b000000;
+                        state = ST_Fetch;
+                    end else begin
+                      COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end
                 end
                 ST_JR: begin
                     // TODO

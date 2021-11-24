@@ -317,16 +317,118 @@ module cpu (
         ShiftReg_Out
     );
 
+    Registrador MemMultA_(
+        // Entradas
+        clk,
+        reset,
+        AuxMultA,
+        Mem_Out,
+        // Saidas
+        MemMultA_Out
+    );
+
+    Registrador MemMultB_(
+        // Entradas
+        clk,
+        reset,
+        AuxMultB,
+        Mem_Out,
+        // Saidas
+        MemMultB_Out
+    );
+
+    Registrador Hi_(
+        // Entradas
+        clk,
+        reset,
+        Hi_load,
+        Mem_Out,
+        // Saidas
+        Hi_out
+    );
+
+    Registrador Lo_(
+        // Entradas
+        clk,
+        reset,
+        Lo_load,
+        Mem_Out,
+        // Saidas
+        Lo_out
+    );
+
+    Mux_MultDiv mux_DivmA_(
+        // Entradas
+        MemA/A,
+        MemMultA_Out,
+        A_Out,
+        // Saídas
+        mux_DivmA_out
+    );
+
+    Mux_MultDiv mux_DivmB_(
+        // Entradas
+        MemB/B,
+        MemMultB_Out,
+        B_Out,
+        // Saídas
+        mux_DivmB_out
+    );
+
+    Mux_MultDiv mux_MultDivHi_(
+        // Entradas
+        Mult/Div,
+        MultHi,
+        DivHi,
+        // Saídas
+        MultDivHi_out
+    );
+
+    Mux_MultDiv mux_MultDivLo_(
+        // Entradas
+        Mult/Div,
+        MultLo,
+        DivLo,
+        // Saídas
+        MultDivLo_out
+    );
+
     Mult mult_(
         //Entradas
         clk,
         reset,
         resetlocal,
-        A_Out,
-        B_Out,
+        mux_DivmA_out,
+        mux_DivmB_out,
         //Saidas
-        Hi,
-        Lo
+        MultHi,
+        MultLo
+    );
+
+    Div div_(
+        //Entradas
+        clk,
+        reset,
+        resetlocal,
+        mux_DivmA_out,
+        mux_DivmB_out,
+        //Saidas
+        ZeroDivision
+        DivHi,
+        DivLo
+    );
+
+    Div divm_(
+        //Entradas
+        clk,
+        reset,
+        resetlocal,
+        mux_DivmA_out,
+        mux_DivmB_out,
+        //Saidas
+        ZeroDivision
+        DivHi,
+        DivLo
     );
 
     Control control_(
