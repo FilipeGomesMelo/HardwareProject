@@ -3,10 +3,8 @@ module Div (input wire clk, reset, resetlocal,
             output reg ZeroDivision,
             output reg [31:0] Hi, Lo
 );
-
     reg [31:0] divs, divd;
     reg [31:0] quociente, resto;
-
     reg [5:0] digito_atual;
 
     always @ (posedge clk) begin
