@@ -14,6 +14,8 @@ module cpu (
     
     // control wires (REGs)
     wire PcWrite;
+    wire EQCond;
+    wire NECond;
     wire Load_AB;
     wire ALUOut_Load;
     wire EPCwrite;
@@ -76,11 +78,15 @@ module cpu (
     wire ALU_gt;
     wire ALU_lt;
 
+    wire WriteSignal;
+
+    assign WriteSignal = PcWrite || (ALU_eq && EQCond) || (!ALU_eq && NECond);
+    
     Registrador PC_(
         // Entradas
         clk,
         reset,
-        PcWrite, // vamos ter que trocar isso quando for pra implementar os Branches
+        WriteSignal, // CRCP - troquei aqui pelo PcWrite //vamos ter que trocar isso quando for pra implementar os Branches
         mux_PcSource_out,
         // Saidas
         Pc_Out
@@ -332,6 +338,8 @@ module cpu (
         ShiftIn,
         ShiftS,
         PcWrite,
+        EQCond,
+        NECond,
         Load_AB,
         ALUOut_Load,
         EPCwrite,

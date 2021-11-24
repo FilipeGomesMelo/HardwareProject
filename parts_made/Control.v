@@ -22,6 +22,8 @@ module Control (
 
         // control regs (REGs)
         output reg PcWrite,
+        output reg EQCond,
+        output reg NECond,
         output reg Load_AB,
         output reg ALUOut_Load,
         output reg EPCwrite,
@@ -832,14 +834,76 @@ module Control (
                     end
                 end
                 ST_BEQ: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // CRCP
+                    if(COUNTER == 5'b00000) begin
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b01;
+                        ALUOp = 3'b010;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+                        EQCond = 1'b1;
+                        
+                        COUNTER = COUNTER + 5'b00001;
+
+                    end else if(COUNTER == 5'b00001) begin
+                        ALUOut_Load = 1'b0;
+                        
+                        PcSource = 2'b00;
+                        EQCond = 1'b0;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;                    
+                    end
                 end
                 ST_BNE: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // CRCP
+                    if(COUNTER == 5'b00000) begin
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b01;
+                        ALUOp = 3'b010;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+                        NECond = 1'b1;
+                        
+                        COUNTER = COUNTER + 5'b00001;
+
+                    end else if(COUNTER == 5'b00001) begin
+                        ALUOut_Load = 1'b0;
+                        
+                        PcSource = 2'b00;
+                        NECond = 1'b0;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;                    
+                    end
                 end
                 ST_BLE: begin
                     // TODO
