@@ -450,6 +450,11 @@ module Control (
                         MemA/A = 1'b1;
                         MemB/B = 1'b1;
                         Mult/Div = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                        if (ZeroDivision == 1'b1) begin
+                          COUNTERDIVMULT = 6'b000000;
+                          state = ST_ZeroDiv;
+                      end
                     end else if (COUNTERDIVMULT == 6'b100001) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
@@ -457,10 +462,6 @@ module Control (
                         COUNTERDIVMULT = 6'b000000;
                         state = ST_Fetch;
                     end else begin
-                      if (ZeroDivision == 1'b1) begin
-                          COUNTERDIVMULT = 6'b000000;
-                          state = ST_ZeroDiv;
-                      end
                       COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end
                 end
@@ -484,24 +485,55 @@ module Control (
                         LoadCtrl = 2'b00;
                         StoreCtrl = 2'b00;
 
-                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end else if (COUNTERDIVMULT == 6'b000001) begin
                         //preparando os sinais
                         Load_AB = 1'b0;
                         ALUOut_Load = 1'b0;
                         ALUSrcA = 2'b10;
                         ALUOp = 3'b000;
-                    end else if (COUNTERDIVMULT == 6'b100001) begin
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000010 || COUNTERDIVMULT == 6'b000011 || COUNTERDIVMULT == 6'b000100) begin
+                        // Leitura da memória
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000101) begin
+                        // Salvando no reg temporario
+                        MemRead = 1'b0;
+                        MemA/A = 1'b0;
+                        AuxMultA = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000110) begin
+                        //preparando os sinais
+                        AuxMultA = 1'b0;
+                        ALUSrcA = 2'b00;
+                        ALUSrcB = 2'b01;
+                        ALUOp = 3'b001;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000111 || COUNTERDIVMULT == 6'b001000 || COUNTERDIVMULT == 6'b001001) begin
+                        // Leitura da memória
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b001010) begin
+                       // Salvando no reg temporario
+                        MemRead = 1'b0;
+                        MemB/B = 1'b0;
+                        AuxMultB = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                        if (ZeroDivision == 1'b1) begin
+                          COUNTERDIVMULT = 6'b000000;
+                          state = ST_ZeroDiv;
+                        end
+                    end else if (COUNTERDIVMULT == 6'b101011) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
                         Lo_load = 1'b1;
+                        AuxMultB = 1'b0;
+                        Div/Mult = 1'b1;
                         COUNTERDIVMULT = 6'b000000;
                         state = ST_Fetch;
                     end else begin
-                      if (ZeroDivision == 1'b1) begin
-                          COUNTERDIVMULT = 6'b000000;
-                          state = ST_ZeroDiv;
-                      end
                       COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end
                 end
@@ -534,6 +566,7 @@ module Control (
                         MemA/A = 1'b1;
                         MemB/B = 1'b1;
                         Mult/Div = 1'b0;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end else if (COUNTERDIVMULT == 6'b100001) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
