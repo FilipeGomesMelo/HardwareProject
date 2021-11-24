@@ -372,7 +372,6 @@ module Control (
 
                         COUNTER = COUNTER + 5'b00001;
                     end else if (COUNTER == 5'b00011) begin
-
                         // Sinais do ciclo
                         MemRead = 1'b0;
                         EPCwrite = 1'b1;
@@ -396,7 +395,6 @@ module Control (
                     end
                 end
                 ST_Overflow: begin
-                    // Opticode Error
                     if (COUNTER == 5'b00000 || COUNTER == 5'b00001 || COUNTER == 5'b00010) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
@@ -418,7 +416,6 @@ module Control (
 
                         COUNTER = COUNTER + 5'b00001;
                     end else if (COUNTER == 5'b00011) begin
-
                         // Sinais do ciclo
                         MemRead = 1'b0;
                         EPCwrite = 1'b1;
@@ -442,7 +439,6 @@ module Control (
                     end
                 end
                 ST_ZeroDiv: begin
-                    // Opticode Error
                     if (COUNTER == 5'b00000 || COUNTER == 5'b00001 || COUNTER == 5'b00010) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
@@ -464,7 +460,6 @@ module Control (
 
                         COUNTER = COUNTER + 5'b00001;
                     end else if (COUNTER == 5'b00011) begin
-
                         // Sinais do ciclo
                         MemRead = 1'b0;
                         EPCwrite = 1'b1;
