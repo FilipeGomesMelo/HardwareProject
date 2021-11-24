@@ -583,14 +583,79 @@ module Control (
                     state = ST_Fetch;
                 end
                 ST_MFHI: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if(COUNTER == 5'b00000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        // reseta o valor do registrador da pilha no banco de registradores
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+
+                        COUNTER = COUNTER + 5'b00001;
+
+                    end else if(COUNTER == 5'b00001) begin
+                        ALUOut_Load = 1'b0;
+                        Load_AB = 1'b0;
+                        WD_REG = 3'b010;
+                        WR_REG = 2'b01;
+                        RegWrite = 1'b1;
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_MFLO: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if(COUNTER == 5'b00000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        // reseta o valor do registrador da pilha no banco de registradores
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+
+                        COUNTER = COUNTER + 5'b00001;
+
+                    end else if(COUNTER == 5'b00001) begin
+                        ALUOut_Load = 1'b0;
+                        Load_AB = 1'b0;
+                        WD_REG = 3'b011;
+                        WR_REG = 2'b01;
+                        RegWrite = 1'b1;
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
+                end
                 end
                 ST_SLL: begin
                     // Shifts
