@@ -1,5 +1,5 @@
 module Div (input wire clk, reset, resetlocal,
-            input wire [31:0] Divisor, Dividendo,
+            input wire [31:0] Dividendo, Divisor,
             output reg ZeroDivision,
             output reg [31:0] Hi, Lo
 );
@@ -9,6 +9,12 @@ module Div (input wire clk, reset, resetlocal,
 
     always @ (posedge clk) begin
         if (reset == 1'b1 | resetlocal == 1'b1) begin
+            Hi = 32'b0;
+			Lo  = 32'b0;
+            ZeroDivision = 1'b0;
+            digito_atual = 6'd32;
+            quociente = 32'b0;
+            resto = 32'b0;
             if (Divisor == 32'b0) begin
                 ZeroDivision = 1'b1;
             end else begin
@@ -23,11 +29,6 @@ module Div (input wire clk, reset, resetlocal,
                 end else begin
                     divd = Dividendo;
                 end
-
-                ZeroDivision = 1'b0;
-                digito_atual = 6'd32;
-                quociente = 32'b0;
-                resto = 32'b0;
             end
         end else if (digito_atual != 6'd000000 && !ZeroDivision) begin
             resto = resto << 1;

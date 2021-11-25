@@ -15,6 +15,8 @@ module Mult (input wire clk, reset, resetlocal,
 			Q0 = 0;
 			N = 6'd32;
 			ComplementoM = ~M + 1'b1;
+			Hi = 32'b0;
+			Lo  = 32'b0;
 		end else if (N != 6'd0) begin
 			if (Q0 == 1'b1 && Q[0] == 1'b0) begin
 				a = a + M;
