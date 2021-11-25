@@ -95,7 +95,7 @@ module Control (
     parameter ST_SB = 6'b100_010;
     parameter ST_SH = 6'b100_011;
     parameter ST_SLTI = 6'b100_100;
-    parameter ST_RT = 6'b100_101;
+    parameter ST_SW = 6'b100_101;
 
     // Estados Tipo J
     parameter ST_J = 6'b100_110;
@@ -120,7 +120,7 @@ module Control (
     parameter OP_SB = 6'b101_000;
     parameter OP_SH = 6'b101_001;
     parameter OP_SLTI = 6'b001_010;
-    parameter OP_RT = 6'b101_011;
+    parameter OP_SW = 6'b101_011;
 
     // Estados Tipo J
     parameter OP_J = 6'b000_010;
@@ -344,8 +344,8 @@ module Control (
                             OP_SLTI: begin
                                 state = ST_SLTI;
                             end
-                            OP_RT: begin
-                                state = ST_RT;
+                            OP_SW: begin
+                                state = ST_SW;
                             end
                             OP_J: begin
                                 state = ST_J;
@@ -359,19 +359,137 @@ module Control (
                     end
                 end
                 ST_OPError: begin
-                    // OPcode inexistente
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // Opticode Error
+                    if (COUNTER == 5'b00000 || COUNTER == 5'b00001 || COUNTER == 5'b00010) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ExCause = 2'b00;
+                        IorD = 2'b01;
+                        MemRead = 1'b1;
+                        ALUSrcA = 2'b00;
+                        ALUSrcB = 2'b01;
+                        ALUOp = 3'b010;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b00011) begin
+                        // Sinais do ciclo
+                        MemRead = 1'b0;
+                        EPCwrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else begin
+                        // Zerando sinais do anterior
+                        EPCwrite = 1'b0;
+
+                        // Sinais do ciclo
+                        SingExCtrl = 1'b1;
+                        ALUSrcA = 2'b01;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+                        PcSource = 2'b00;
+                        PcWrite = 1'b1;
+
+                        // TODO
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_Overflow: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTER == 5'b00000 || COUNTER == 5'b00001 || COUNTER == 5'b00010) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ExCause = 2'b01;
+                        IorD = 2'b01;
+                        MemRead = 1'b1;
+                        ALUSrcA = 2'b00;
+                        ALUSrcB = 2'b01;
+                        ALUOp = 3'b010;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b00011) begin
+                        // Sinais do ciclo
+                        MemRead = 1'b0;
+                        EPCwrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else begin
+                        // Zerando sinais do anterior
+                        EPCwrite = 1'b0;
+
+                        // Sinais do ciclo
+                        SingExCtrl = 1'b1;
+                        ALUSrcA = 2'b01;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+                        PcSource = 2'b00;
+                        PcWrite = 1'b1;
+
+                        // TODO
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_ZeroDiv: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTER == 5'b00000 || COUNTER == 5'b00001 || COUNTER == 5'b00010) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ExCause = 2'b10;
+                        IorD = 2'b01;
+                        MemRead = 1'b1;
+                        ALUSrcA = 2'b00;
+                        ALUSrcB = 2'b01;
+                        ALUOp = 3'b010;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b00011) begin
+                        // Sinais do ciclo
+                        MemRead = 1'b0;
+                        EPCwrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else begin
+                        // Zerando sinais do anterior
+                        EPCwrite = 1'b0;
+
+                        // Sinais do ciclo
+                        SingExCtrl = 1'b1;
+                        ALUSrcA = 2'b01;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+                        PcSource = 2'b00;
+                        PcWrite = 1'b1;
+
+                        // TODO
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_ADD: begin
                     // CRCP
@@ -492,14 +610,6 @@ module Control (
                         MemRead = 1'b0;
                         IRWrite = 1'b0;
                         SingExCtrl = 1'b0;
-                        ExCause = 2'b00;
-                        IorD = 2'b00;
-                        ALUSrcA = 2'b10;
-                        ALUSrcB = 2'b00;
-                        PcSource = 2'b00;
-                        ALUOp = 3'b001;
-                        LoadCtrl = 2'b00;
-                        StoreCtrl = 2'b00;
 
                         // Sinais do ciclo
                         ShiftIn = 2'b10;
@@ -537,14 +647,6 @@ module Control (
                         MemRead = 1'b0;
                         IRWrite = 1'b0;
                         SingExCtrl = 1'b0;
-                        ExCause = 2'b00;
-                        IorD = 2'b00;
-                        ALUSrcA = 2'b10;
-                        ALUSrcB = 2'b00;
-                        PcSource = 2'b00;
-                        ALUOp = 3'b001;
-                        LoadCtrl = 2'b00;
-                        StoreCtrl = 2'b00;
 
                         // Sinais do ciclo
                         ShiftIn = 2'b00;
@@ -587,14 +689,6 @@ module Control (
                         MemRead = 1'b0;
                         IRWrite = 1'b0;
                         SingExCtrl = 1'b0;
-                        ExCause = 2'b00;
-                        IorD = 2'b00;
-                        ALUSrcA = 2'b10;
-                        ALUSrcB = 2'b00;
-                        PcSource = 2'b00;
-                        ALUOp = 3'b001;
-                        LoadCtrl = 2'b00;
-                        StoreCtrl = 2'b00;
 
                         // Sinais do ciclo
                         ShiftIn = 2'b10;
@@ -632,14 +726,6 @@ module Control (
                         MemRead = 1'b0;
                         IRWrite = 1'b0;
                         SingExCtrl = 1'b0;
-                        ExCause = 2'b00;
-                        IorD = 2'b00;
-                        ALUSrcA = 2'b10;
-                        ALUSrcB = 2'b00;
-                        PcSource = 2'b00;
-                        ALUOp = 3'b001;
-                        LoadCtrl = 2'b00;
-                        StoreCtrl = 2'b00;
 
                         // Sinais do ciclo
                         ShiftIn = 2'b00;
@@ -677,14 +763,6 @@ module Control (
                         MemRead = 1'b0;
                         IRWrite = 1'b0;
                         SingExCtrl = 1'b0;
-                        ExCause = 2'b00;
-                        IorD = 2'b00;
-                        ALUSrcA = 2'b10;
-                        ALUSrcB = 2'b00;
-                        PcSource = 2'b00;
-                        ALUOp = 3'b001;
-                        LoadCtrl = 2'b00;
-                        StoreCtrl = 2'b00;
 
                         // Sinais do ciclo
                         ShiftIn = 2'b10;
@@ -753,7 +831,23 @@ module Control (
                     end
                 end
                 ST_BREAK: begin
-                    // TODO
+                    // Zera sinais do ciclo anterior
+                    PcWrite = 1'b0;
+                    Load_AB = 1'b0;
+                    ALUOut_Load = 1'b0;
+                    EPCwrite = 1'b0;
+                    MemWrite = 1'b0;
+                    MemRead = 1'b0;
+                    IRWrite = 1'b0;
+                    SingExCtrl = 1'b0;
+
+                    // Sinais do ciclo
+                    ALUSrcA = 2'b00;
+                    ALUSrcB = 2'b01;
+                    ALUOp = 3'b010;
+                    PcSource = 2'b00;
+                    PcWrite = 1'b1;
+
                     COUNTER = 5'b00000;
                     state = ST_Fetch;
                 end
@@ -957,49 +1051,339 @@ module Control (
                     end
                 end
                 ST_SRAM: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // Shifts
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ALUSrcA = 2'b10;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010 || COUNTER == 5'b000011) begin
+                        IorD = 2'b11;
+                        MemRead = 1'b1;                        
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do anterior
+                        MemRead = 1'b0;  
+
+                        // Sinais do ciclo
+                        ShiftIn = 2'b10;
+                        ShiftS = 2'b10;
+                        ShiftCtrl = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000101) begin
+                        // Sinais do ciclo
+                        ShiftCtrl = 3'b100;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000110) begin
+                        // Zera os sinais
+                        ShiftCtrl = 3'b000; 
+
+                        // Sinais do ciclo
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b101;
+                        RegWrite = 1'b1;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_LB: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ALUSrcA = 2'b10;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
+                        // Saidas do ciclo
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000011) begin
+                        // Sinais do ciclo
+                        LoadCtrl = 2'b10;
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b001;
+                        RegWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_LH: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ALUSrcA = 2'b10;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
+                        // Saidas do ciclo
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000011) begin
+                        // Sinais do ciclo
+                        LoadCtrl = 2'b01;
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b001;
+                        RegWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_LUI: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // Shifts
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ShiftIn = 2'b01;
+                        ShiftS = 2'b11;
+                        ShiftCtrl = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001) begin
+                        // Sinais do ciclo
+                        ShiftCtrl = 3'b010;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000010) begin
+                        // Zera os sinais
+                        ShiftCtrl = 3'b000; 
+
+                        // Sinais do ciclo
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b101;
+                        RegWrite = 1'b1;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_LW: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ALUSrcA = 2'b10;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
+                        // Saidas do ciclo
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000011) begin
+                        // Sinais do ciclo
+                        LoadCtrl = 2'b00;
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b001;
+                        RegWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_SB: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ALUSrcA = 2'b10;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
+                        // Saidas do ciclo
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000011) begin
+                        // Sinais do ciclo
+                        StoreCtrl = 2'b10;
+                        MemWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_SH: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ALUSrcA = 2'b10;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
+                        // Saidas do ciclo
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000011) begin
+                        // Sinais do ciclo
+                        StoreCtrl = 2'b01;
+                        MemWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_SLTI: begin
                     // TODO
                     COUNTER = 5'b00000;
                     state = ST_Fetch;
                 end
-                ST_RT: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                ST_SW: begin
+                    if (COUNTER == 5'b000000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+
+                        // Sinais do ciclo
+                        ALUSrcA = 2'b10;
+                        SingExCtrl = 1'b0;
+                        ALUSrcB = 2'b10;
+                        ALUOp = 3'b001;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000001 || COUNTER == 5'b000010) begin
+                        // Saidas do ciclo
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000011) begin
+                        // Sinais do ciclo
+                        StoreCtrl = 2'b00;
+                        MemWrite = 1'b1;
+
+                        COUNTER = COUNTER + 5'b00001;
+                    end else if (COUNTER == 5'b000100) begin
+                        // Zera os sinais do ciclo anterior
+                        MemRead = 1'b0;
+
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_J: begin
                     // TODO

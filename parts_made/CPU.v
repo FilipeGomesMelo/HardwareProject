@@ -108,7 +108,7 @@ module cpu (
 
     Mux_ExCause ExCause_(
         // Entradas
-        IorD,
+        ExCause,
         // Saidas
         ExCause_Out
     );
@@ -145,6 +145,15 @@ module cpu (
         RS,
         RT,
         Immediate
+    );
+
+    StoreAux store_aux_(
+        // Entradas
+        StoreCtrl,
+        B_Out,
+        Mem_Out,
+        // Saidas
+        StoreAux_Out
     );
 
     LoadAux load_aux_(
