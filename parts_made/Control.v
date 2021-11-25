@@ -19,6 +19,9 @@ module Control (
         output reg [2:0] WD_REG,
         output reg [1:0] ShiftIn,
         output reg [1:0] ShiftS,
+        output reg Mult_Div,
+        output reg MemA_A,
+        output reg MemB_B,
 
         // control regs (REGs)
         output reg PcWrite,
@@ -29,6 +32,11 @@ module Control (
         output reg Load_AB,
         output reg ALUOut_Load,
         output reg EPCwrite,
+        output reg AuxMultA,
+        output reg AuxMultB,
+        output reg Hi_load,
+        output reg Lo_load,
+        output reg resetlocal,
 
         // control regs (big boys)
         output reg MemWrite,
@@ -49,6 +57,7 @@ module Control (
     // Variáveis internas
     reg [5:0] state;
     reg [4:0] COUNTER;
+    reg [5:0] COUNTERDIVMULT;
 
     // Constantes internas (estados)
     // Universal
@@ -169,6 +178,15 @@ module Control (
             ShiftIn = 2'b00;
             ShiftS = 2'b00;
             ShiftCtrl = 3'b000;
+            Mult_Div = 1'b0;
+            MemA_A = 1'b0;
+            MemB_B = 1'b0;
+            AuxMultA  = 1'b0;
+            AuxMultB  = 1'b0;
+            Hi_load  = 1'b0;
+            Lo_load  = 1'b0;
+            COUNTERDIVMULT = 6'b0;
+            resetlocal = 1'b0;
 
             // reseta o valor do registratodor da pilha no banco de registradores
             WR_REG = 2'b11;
@@ -191,9 +209,18 @@ module Control (
                         EPCwrite = 1'b0;
                         MemWrite = 1'b0;
                         IRWrite = 1'b0;
+                        Mult_Div = 1'b0;
+                        MemA_A = 1'b0;
+                        MemB_B = 1'b0;
+                        AuxMultA  = 1'b0;
+                        AuxMultB  = 1'b0;
+                        Hi_load  = 1'b0;
+                        Lo_load  = 1'b0;
+                        COUNTERDIVMULT = 6'b0;
+                        resetlocal = 1'b0;
 
                         // Primeiros 3 ciclos pro load
-                        IorD = 1'b00;
+                        IorD = 2'b00;
                         MemRead = 1'b1;
                         ALUSrcA = 2'b00;
                         ALUSrcB = 2'b01;
@@ -574,14 +601,162 @@ module Control (
                     end
                 end
                 ST_DIV: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if (COUNTERDIVMULT == 6'b000000) begin
+                        //zera sinais anteriores
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        resetlocal = 1'b1;
+                        //preparando os sinais
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        MemA_A = 1'b1;
+                        MemB_B = 1'b1;
+                        Mult_Div = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b100001) begin
+                        //sinais de escrita pra terminar a operação
+                        Hi_load = 1'b1;
+                        Lo_load = 1'b1;
+                        COUNTERDIVMULT = 6'b000000;
+                        state = ST_Fetch;
+                    end else begin
+                        resetlocal = 1'b0;
+                        if (zero_div == 1'b1) begin
+                          COUNTERDIVMULT = 6'b000000;
+                          state = ST_ZeroDiv;
+                        end
+
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end
+                end
+                ST_DIVM: begin
+                    if (COUNTERDIVMULT == 6'b000000) begin
+                        //zera sinais anteriores
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        //preparando os sinais
+                        resetlocal = 1'b1;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        ALUSrcA = 2'b10;
+                        ALUOp = 3'b000;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000001 || COUNTERDIVMULT == 6'b000010 || COUNTERDIVMULT == 6'b000011) begin
+                        // Leitura da memória
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000100) begin
+                        // Salvando no reg temporario
+                        MemRead = 1'b0;
+                        MemA_A = 1'b0;
+                        AuxMultA = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000101) begin
+                        //preparando os sinais
+                        AuxMultA = 1'b0;
+                        ALUSrcA = 2'b00;
+                        ALUSrcB = 2'b01;
+                        ALUOp = 3'b001;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b000110 || COUNTERDIVMULT == 6'b000111 || COUNTERDIVMULT == 6'b001000) begin
+                        // Leitura da memória
+                        IorD = 2'b11;
+                        MemRead = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b001001) begin
+                       // Salvando no reg temporario
+                        MemRead = 1'b0;
+                        MemB_B = 1'b0;
+                        AuxMultB = 1'b1;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                        if (zero_div == 1'b1) begin
+                          COUNTERDIVMULT = 6'b000000;
+                          state = ST_ZeroDiv;
+                        end
+                    end else if (COUNTERDIVMULT == 6'b101010) begin
+                        //sinais de escrita pra terminar a operação
+                        Hi_load = 1'b1;
+                        Lo_load = 1'b1;
+                        AuxMultB = 1'b0;
+                        Mult_Div = 1'b1;
+                        COUNTERDIVMULT = 6'b000000;
+                        state = ST_Fetch;
+                    end else begin
+                        resetlocal = 1'b0;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end
                 end
                 ST_MULT: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    // Multiplicação
+                    if (COUNTERDIVMULT == 6'b000000) begin
+                        //zera sinais anteriores
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        resetlocal = 1'b1;
+
+                        //preparando os sinais
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b0;
+                        MemA_A = 1'b1;
+                        MemB_B = 1'b1;
+                        Mult_Div = 1'b0;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end else if (COUNTERDIVMULT == 6'b100001) begin
+                        //sinais de escrita pra terminar a operação
+                        Hi_load = 1'b1;
+                        Lo_load = 1'b1;
+                        COUNTERDIVMULT = 6'b000000;
+                        state = ST_Fetch;
+                    end else begin
+                        resetlocal = 1'b0;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                    end
                 end
                 ST_JR: begin
                     // TODO
@@ -589,18 +764,76 @@ module Control (
                     state = ST_Fetch;
                 end
                 ST_MFHI: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if(COUNTER == 5'b00000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        // reseta o valor do registrador da pilha no banco de registradores
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+
+                        ALUOut_Load = 1'b0;
+                        Load_AB = 1'b0;
+                        WD_REG = 3'b010;
+                        WR_REG = 2'b01;
+                        RegWrite = 1'b1;
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_MFLO: begin
-                    // TODO
-                    COUNTER = 5'b00000;
-                    state = ST_Fetch;
+                    if(COUNTER == 5'b00000) begin
+                        // Coloca todos sinais de controle para 0
+                        PcWrite = 1'b0;
+                        Load_AB = 1'b0;
+                        ALUOut_Load = 1'b1;
+                        EPCwrite = 1'b0;
+                        MemWrite = 1'b0;
+                        MemRead = 1'b0;
+                        IRWrite = 1'b0;
+                        SingExCtrl = 1'b0;
+                        ExCause = 2'b00;
+                        IorD = 2'b00;
+                        ALUSrcA = 2'b10;
+                        ALUSrcB = 2'b00;
+                        PcSource = 2'b00;
+                        ALUOp = 3'b001;
+                        LoadCtrl = 2'b00;
+                        StoreCtrl = 2'b00;
+
+                        // reseta o valor do registrador da pilha no banco de registradores
+                        WR_REG = 2'b00;
+                        WD_REG = 3'b000;
+                        RegWrite = 1'b0;
+
+                        ALUOut_Load = 1'b0;
+                        Load_AB = 1'b0;
+                        WD_REG = 3'b011;
+                        WR_REG = 2'b01;
+                        RegWrite = 1'b1;
+                        COUNTER = 5'b00000;
+                        state = ST_Fetch;
+                    end
                 end
                 ST_SLL: begin
                     // Shifts
-                    if (COUNTER == 5'b000000) begin
+                    if (COUNTER == 5'b00000) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
                         Load_AB = 1'b0;
@@ -617,12 +850,12 @@ module Control (
                         ShiftCtrl = 3'b001;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000001) begin
+                    end else if (COUNTER == 5'b00001) begin
                         // Sinais do ciclo
                         ShiftCtrl = 3'b010;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000010) begin
+                    end else if (COUNTER == 5'b00010) begin
                         // Zera os sinais
                         ShiftCtrl = 3'b000; 
 
@@ -637,7 +870,7 @@ module Control (
                 end
                 ST_SLLV: begin
                     // Shifts
-                    if (COUNTER == 5'b000000) begin
+                    if (COUNTER == 5'b00000) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
                         Load_AB = 1'b0;
@@ -654,12 +887,12 @@ module Control (
                         ShiftCtrl = 3'b001;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000001) begin
+                    end else if (COUNTER == 5'b00001) begin
                         // Sinais do ciclo
                         ShiftCtrl = 3'b010;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000010) begin
+                    end else if (COUNTER == 5'b00010) begin
                         // Zera os sinais
                         ShiftCtrl = 3'b000; 
 
@@ -679,7 +912,7 @@ module Control (
                 end
                 ST_SRA: begin
                     // Shifts
-                    if (COUNTER == 5'b000000) begin
+                    if (COUNTER == 5'b00000) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
                         Load_AB = 1'b0;
@@ -696,12 +929,12 @@ module Control (
                         ShiftCtrl = 3'b001;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000001) begin
+                    end else if (COUNTER == 5'b00001) begin
                         // Sinais do ciclo
                         ShiftCtrl = 3'b100;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000010) begin
+                    end else if (COUNTER == 5'b00010) begin
                         // Zera os sinais
                         ShiftCtrl = 3'b000; 
 
@@ -716,7 +949,7 @@ module Control (
                 end
                 ST_SRAV: begin
                     // Shifts
-                    if (COUNTER == 5'b000000) begin
+                    if (COUNTER == 5'b00000) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
                         Load_AB = 1'b0;
@@ -733,12 +966,12 @@ module Control (
                         ShiftCtrl = 3'b001;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000001) begin
+                    end else if (COUNTER == 5'b00001) begin
                         // Sinais do ciclo
                         ShiftCtrl = 3'b100;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000010) begin
+                    end else if (COUNTER == 5'b00010) begin
                         // Zera os sinais
                         ShiftCtrl = 3'b000; 
 
@@ -753,7 +986,7 @@ module Control (
                 end
                 ST_SRL: begin
                     // Shifts
-                    if (COUNTER == 5'b000000) begin
+                    if (COUNTER == 5'b00000) begin
                         // Coloca todos sinais de controle para 0
                         PcWrite = 1'b0;
                         Load_AB = 1'b0;
@@ -770,12 +1003,12 @@ module Control (
                         ShiftCtrl = 3'b001;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000001) begin
+                    end else if (COUNTER == 5'b00001) begin
                         // Sinais do ciclo
                         ShiftCtrl = 3'b011;
 
                         COUNTER = COUNTER + 5'b00001;
-                    end else if (COUNTER == 5'b000010) begin
+                    end else if (COUNTER == 5'b00010) begin
                         // Zera os sinais
                         ShiftCtrl = 3'b000; 
 

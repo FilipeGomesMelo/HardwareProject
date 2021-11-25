@@ -34,6 +34,15 @@ module cpu (
     wire [1:0] ShiftS;
     wire [2:0] ShiftCtrl;
 
+    // control wires (mult_div)
+    wire Mult_Div;
+    wire MemA_A;
+    wire MemB_B;
+    wire Hi_load;
+    wire Lo_load;
+    wire resetlocal;
+    wire ZeroDivision;
+
     // control wires (others)
     wire SingExCtrl;
     wire [1:0] LoadCtrl;
@@ -66,6 +75,22 @@ module cpu (
     wire [31:0] ReadData1;
     wire [31:0] ReadData2;
     wire [31:0] EPC_Out;
+
+    // Data Wires (DIV/Mult)
+    wire [31:0] Hi;
+    wire [31:0] Lo;
+    wire [31:0] MemMultA_Out;
+    wire [31:0] MemMultB_Out;
+    wire [31:0] Hi_out;
+    wire [31:0] Lo_out;
+    wire [31:0] mux_DivmA_out;
+    wire [31:0] mux_DivmB_out;
+    wire [31:0] MultDivHi_out;
+    wire [31:0] MultDivLo_out;
+    wire [31:0] MultHi;
+    wire [31:0] MultLo;
+    wire [31:0] DivHi;
+    wire [31:0] DivLo;
 
     // Data Wires (RegDesloc)
     wire [31:0] ShiftIn_Out;
@@ -179,8 +204,8 @@ module cpu (
         ALUOut_Out,
         LoadAux_Out,
         // change later
-        32'd0,
-        32'd0,
+        Hi_out,
+        Lo_out,
         32'd0,
         ShiftReg_Out,
         // Saidas
@@ -342,12 +367,113 @@ module cpu (
         ShiftReg_Out
     );
 
+    Registrador MemMultA_(
+        // Entradas
+        clk,
+        reset,
+        AuxMultA,
+        Mem_Out,
+        // Saidas
+        MemMultA_Out
+    );
+
+    Registrador MemMultB_(
+        // Entradas
+        clk,
+        reset,
+        AuxMultB,
+        Mem_Out,
+        // Saidas
+        MemMultB_Out
+    );
+
+    Registrador Hi_(
+        // Entradas
+        clk,
+        reset,
+        Hi_load,
+        MultDivHi_out,
+        // Saidas
+        Hi_out
+    );
+
+    Registrador Lo_(
+        // Entradas
+        clk,
+        reset,
+        Lo_load,
+        MultDivLo_out,
+        // Saidas
+        Lo_out
+    );
+
+    Mux_MultDiv mux_DivmA_(
+        // Entradas
+        MemA_A,
+        MemMultA_Out,
+        A_Out,
+        // Saídas
+        mux_DivmA_out
+    );
+
+    Mux_MultDiv mux_DivmB_(
+        // Entradas
+        MemB_B,
+        MemMultB_Out,
+        B_Out,
+        // Saídas
+        mux_DivmB_out
+    );
+
+    Mux_MultDiv mux_MultDivHi_(
+        // Entradas
+        Mult_Div,
+        MultHi,
+        DivHi,
+        // Saídas
+        MultDivHi_out
+    );
+
+    Mux_MultDiv mux_MultDivLo_(
+        // Entradas
+        Mult_Div,
+        MultLo,
+        DivLo,
+        // Saídas
+        MultDivLo_out
+    );
+
+    Mult mult_(
+        //Entradas
+        clk,
+        reset,
+        resetlocal,
+        mux_DivmA_out,
+        mux_DivmB_out,
+        //Saidas
+        MultHi,
+        MultLo
+    );
+
+    Div div_(
+        //Entradas
+        clk,
+        reset,
+        resetlocal,
+        mux_DivmA_out,
+        mux_DivmB_out,
+        //Saidas
+        ZeroDivision,
+        DivHi,
+        DivLo
+    );
+
     Control control_(
         // Entradas,
         clk,
         reset,
         ALU_overflow,
-        1'b0,
+        ZeroDivision,
         OP,
         Immediate[5:0],
         // Saidas
@@ -360,6 +486,9 @@ module cpu (
         WD_REG,
         ShiftIn,
         ShiftS,
+        Mult_Div,
+        MemA_A,
+        MemB_B,
         PcWrite,
         EQCond,
         NECond,
@@ -368,6 +497,11 @@ module cpu (
         Load_AB,
         ALUOut_Load,
         EPCwrite,
+        AuxMultA,
+        AuxMultB,
+        Hi_load,
+        Lo_load,
+        resetlocal,
         MemWrite,
         MemRead,
         IRWrite,
