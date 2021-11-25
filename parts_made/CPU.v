@@ -37,6 +37,7 @@ module cpu (
     wire Hi_load;
     wire Lo_load;
     wire resetlocal;
+    wire ZeroDivision;
 
     // control wires (others)
     wire SingExCtrl;
@@ -443,7 +444,7 @@ module cpu (
         clk,
         reset,
         ALU_overflow,
-        1'b0,
+        ZeroDivision,
         OP,
         Immediate[5:0],
         // Saidas

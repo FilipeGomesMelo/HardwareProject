@@ -12,7 +12,7 @@ module Mult (input wire clk, reset, resetlocal,
 			M = A;
 			Q = B;
 			a = 32'b0;
-			Q0 = 0;
+			Q0 = 1'b0;
 			N = 6'd32;
 			ComplementoM = ~M + 1'b1;
 			Hi = 32'b0;
