@@ -438,19 +438,6 @@ module cpu (
         DivLo
     );
 
-    Div divm_(
-        //Entradas
-        clk,
-        reset,
-        resetlocal,
-        mux_DivmA_out,
-        mux_DivmB_out,
-        //Saidas
-        ZeroDivision,
-        DivHi,
-        DivLo
-    );
-
     Control control_(
         // Entradas,
         clk,

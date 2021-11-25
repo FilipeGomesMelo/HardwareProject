@@ -460,9 +460,7 @@ module Control (
                         ALUOp = 3'b001;
                         LoadCtrl = 2'b00;
                         StoreCtrl = 2'b00;
-    
-                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                    end else if (COUNTERDIVMULT == 6'b000001) begin
+
                         resetlocal = 1'b1;
                         //preparando os sinais
                         Load_AB = 1'b0;
@@ -475,7 +473,7 @@ module Control (
                           COUNTERDIVMULT = 6'b000000;
                           state = ST_ZeroDiv;
                       end
-                    end else if (COUNTERDIVMULT == 6'b100010) begin
+                    end else if (COUNTERDIVMULT == 6'b100001) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
                         Lo_load = 1'b1;
@@ -506,37 +504,37 @@ module Control (
                         LoadCtrl = 2'b00;
                         StoreCtrl = 2'b00;
 
-                    end else if (COUNTERDIVMULT == 6'b000001) begin
                         //preparando os sinais
+                        resetlocal = 1'b1;
                         Load_AB = 1'b0;
                         ALUOut_Load = 1'b0;
                         ALUSrcA = 2'b10;
                         ALUOp = 3'b000;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                    end else if (COUNTERDIVMULT == 6'b000010 || COUNTERDIVMULT == 6'b000011 || COUNTERDIVMULT == 6'b000100) begin
+                    end else if (COUNTERDIVMULT == 6'b000001 || COUNTERDIVMULT == 6'b000010 || COUNTERDIVMULT == 6'b000011) begin
                         // Leitura da memória
                         IorD = 2'b11;
                         MemRead = 1'b1;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                    end else if (COUNTERDIVMULT == 6'b000101) begin
+                    end else if (COUNTERDIVMULT == 6'b000100) begin
                         // Salvando no reg temporario
                         MemRead = 1'b0;
                         MemA_A = 1'b0;
                         AuxMultA = 1'b1;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                    end else if (COUNTERDIVMULT == 6'b000110) begin
+                    end else if (COUNTERDIVMULT == 6'b000101) begin
                         //preparando os sinais
                         AuxMultA = 1'b0;
                         ALUSrcA = 2'b00;
                         ALUSrcB = 2'b01;
                         ALUOp = 3'b001;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                    end else if (COUNTERDIVMULT == 6'b000111 || COUNTERDIVMULT == 6'b001000 || COUNTERDIVMULT == 6'b001001) begin
+                    end else if (COUNTERDIVMULT == 6'b000110 || COUNTERDIVMULT == 6'b000111 || COUNTERDIVMULT == 6'b001000) begin
                         // Leitura da memória
                         IorD = 2'b11;
                         MemRead = 1'b1;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                    end else if (COUNTERDIVMULT == 6'b001010) begin
+                    end else if (COUNTERDIVMULT == 6'b001001) begin
                        // Salvando no reg temporario
                         MemRead = 1'b0;
                         MemB_B = 1'b0;
@@ -546,7 +544,7 @@ module Control (
                           COUNTERDIVMULT = 6'b000000;
                           state = ST_ZeroDiv;
                         end
-                    end else if (COUNTERDIVMULT == 6'b101011) begin
+                    end else if (COUNTERDIVMULT == 6'b101010) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
                         Lo_load = 1'b1;
@@ -555,7 +553,8 @@ module Control (
                         COUNTERDIVMULT = 6'b000000;
                         state = ST_Fetch;
                     end else begin
-                      COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
+                        resetlocal = 1'b0;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end
                 end
                 ST_MULT: begin
@@ -581,8 +580,6 @@ module Control (
 
                         resetlocal = 1'b1;
 
-                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                    end else if (COUNTERDIVMULT == 5'b00001) begin
                         //preparando os sinais
                         Load_AB = 1'b0;
                         ALUOut_Load = 1'b0;
@@ -590,7 +587,7 @@ module Control (
                         MemB_B = 1'b1;
                         Mult_Div = 1'b0;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                    end else if (COUNTERDIVMULT == 6'b100010) begin
+                    end else if (COUNTERDIVMULT == 6'b100001) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
                         Lo_load = 1'b1;
@@ -631,9 +628,6 @@ module Control (
                         WD_REG = 3'b000;
                         RegWrite = 1'b0;
 
-                        COUNTER = COUNTER + 5'b00001;
-
-                    end else if(COUNTER == 5'b00001) begin
                         ALUOut_Load = 1'b0;
                         Load_AB = 1'b0;
                         WD_REG = 3'b010;
@@ -668,9 +662,6 @@ module Control (
                         WD_REG = 3'b000;
                         RegWrite = 1'b0;
 
-                        COUNTER = COUNTER + 5'b00001;
-
-                    end else if(COUNTER == 5'b00001) begin
                         ALUOut_Load = 1'b0;
                         Load_AB = 1'b0;
                         WD_REG = 3'b011;
