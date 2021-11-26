@@ -425,7 +425,6 @@ module Control (
                         PcSource = 2'b00;
                         PcWrite = 1'b1;
 
-                        // TODO
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
                     end
@@ -469,7 +468,6 @@ module Control (
                         PcSource = 2'b00;
                         PcWrite = 1'b1;
 
-                        // TODO
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
                     end
@@ -513,7 +511,6 @@ module Control (
                         PcSource = 2'b00;
                         PcWrite = 1'b1;
 
-                        // TODO
                         COUNTER = 5'b00000;
                         state = ST_Fetch;
                     end
@@ -665,7 +662,6 @@ module Control (
                         StoreCtrl = 2'b00;
 
                         //preparando os sinais
-                        resetlocal = 1'b1;
                         Load_AB = 1'b0;
                         ALUOut_Load = 1'b0;
                         ALUSrcA = 2'b10;
@@ -685,8 +681,8 @@ module Control (
                     end else if (COUNTERDIVMULT == 6'b000101) begin
                         //preparando os sinais
                         AuxMultA = 1'b0;
-                        ALUSrcA = 2'b00;
-                        ALUSrcB = 2'b01;
+                        ALUSrcA = 2'b01;
+                        ALUSrcB = 2'b00;
                         ALUOp = 3'b001;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end else if (COUNTERDIVMULT == 6'b000110 || COUNTERDIVMULT == 6'b000111 || COUNTERDIVMULT == 6'b001000) begin
@@ -695,7 +691,7 @@ module Control (
                         MemRead = 1'b1;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end else if (COUNTERDIVMULT == 6'b001001) begin
-                       // Salvando no reg temporario
+                        // Salvando no reg temporario
                         MemRead = 1'b0;
                         MemB_B = 1'b0;
                         AuxMultB = 1'b1;
@@ -704,7 +700,14 @@ module Control (
                           COUNTERDIVMULT = 6'b000000;
                           state = ST_ZeroDiv;
                         end
-                    end else if (COUNTERDIVMULT == 6'b101010) begin
+                    end else if (COUNTERDIVMULT == 6'b001010) begin
+                        resetlocal = 1'b1;
+                        if (zero_div == 1'b1) begin
+                          COUNTERDIVMULT = 6'b000000;
+                          state = ST_ZeroDiv;
+                        end                
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;  
+                    end else if (COUNTERDIVMULT == 6'b101011) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
                         Lo_load = 1'b1;
