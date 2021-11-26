@@ -951,7 +951,7 @@ module Control (
                         RegWrite = 1'b0;                      
                         
                         COUNTER = COUNTER + 5'b00001;
-                    end else  if(COUNTER == 5'b00000) begin
+                    end else if(COUNTER == 5'b00001) begin
                         
                         WR_REG = 2'b01;
                         WD_REG = 3'b100;
@@ -1136,7 +1136,19 @@ module Control (
                     state = ST_Fetch;
                 end
                 ST_RTE: begin
-                    // TODO
+                    // Zera sinais do ciclo anterior
+                    PcWrite = 1'b0;
+                    Load_AB = 1'b0;
+                    ALUOut_Load = 1'b0;
+                    EPCwrite = 1'b0;
+                    MemWrite = 1'b0;
+                    MemRead = 1'b0;
+                    IRWrite = 1'b0;
+                    SingExCtrl = 1'b0;
+
+                    PcSource = 2'b11;
+                    PcWrite = 1'b1;
+                    
                     COUNTER = 5'b00000;
                     state = ST_Fetch;
                 end
@@ -1649,9 +1661,9 @@ module Control (
                         RegWrite = 1'b0;                      
                         
                         COUNTER = COUNTER + 5'b00001;
-                    end else  if(COUNTER == 5'b00000) begin
+                    end else  if(COUNTER == 5'b00001) begin
                         
-                        WR_REG = 2'b01;
+                        WR_REG = 2'b00;
                         WD_REG = 3'b100;
                         RegWrite = 1'b1;     
 

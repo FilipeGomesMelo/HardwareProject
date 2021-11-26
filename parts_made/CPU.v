@@ -47,6 +47,7 @@ module cpu (
     wire SingExCtrl;
     wire [1:0] LoadCtrl;
     wire [1:0] StoreCtrl;
+    wire [31:0] ex_1to32_out;
 
     // Data wires
     // Acho uma boa tentar dividir isso melhor dps
@@ -198,6 +199,13 @@ module cpu (
         mux_wr_Out
     );
 
+    Ex_1to32 ex_1to32_(
+        // Entrada
+        ALU_lt,
+        // Saidas
+        ex_1to32_out
+    );
+
     Mux_WD mux_wd_(
         // Entradas
         WD_REG,
@@ -206,7 +214,7 @@ module cpu (
         // change later
         Hi_out,
         Lo_out,
-        32'd0,
+        ex_1to32_out,
         ShiftReg_Out,
         // Saidas
         mux_wd_Out
