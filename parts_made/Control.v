@@ -696,17 +696,12 @@ module Control (
                         MemB_B = 1'b0;
                         AuxMultB = 1'b1;
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
-                        if (zero_div == 1'b1) begin
-                          COUNTERDIVMULT = 6'b000000;
-                          state = ST_ZeroDiv;
-                        end
                     end else if (COUNTERDIVMULT == 6'b001010) begin
-                        resetlocal = 1'b1;
-                        if (zero_div == 1'b1) begin
-                          COUNTERDIVMULT = 6'b000000;
-                          state = ST_ZeroDiv;
-                        end                
+                        resetlocal = 1'b1;          
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;  
+                    end else if (COUNTERDIVMULT == 6'b001011) begin
+                        resetlocal = 1'b0;          
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001; 
                     end else if (COUNTERDIVMULT == 6'b101011) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
@@ -717,6 +712,10 @@ module Control (
                         state = ST_Fetch;
                     end else begin
                         resetlocal = 1'b0;
+                        if (zero_div == 1'b1) begin
+                          COUNTERDIVMULT = 6'b000000;
+                          state = ST_ZeroDiv;
+                        end
                         COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end
                 end
