@@ -545,11 +545,13 @@ module Control (
                           COUNTERDIVMULT = 6'b000000;
                           state = ST_ZeroDiv;
                         end
+                    end else if (COUNTERDIVMULT == 6'b0010010) begin
+                        AuxMultB = 1'b0;
+                        COUNTERDIVMULT = COUNTERDIVMULT + 6'b000001;
                     end else if (COUNTERDIVMULT == 6'b101010) begin
                         //sinais de escrita pra terminar a operação
                         Hi_load = 1'b1;
                         Lo_load = 1'b1;
-                        AuxMultB = 1'b0;
                         Mult_Div = 1'b1;
                         COUNTERDIVMULT = 6'b000000;
                         state = ST_Fetch;

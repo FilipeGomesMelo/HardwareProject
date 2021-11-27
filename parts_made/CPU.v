@@ -36,6 +36,8 @@ module cpu (
     wire MemB_B;
     wire Hi_load;
     wire Lo_load;
+    wire AuxMultB;
+    wire AuxMultA;
     wire resetlocal;
     wire ZeroDivision;
 
